@@ -3,22 +3,22 @@ const express = require('express')
 const app = express();
 const port = 5000;
 
-
 app.use(express.json());
 
 //database connection
 const db = new sqlite3.Database('biometrics');
 
 db.serialize(()=> {
-    db.run('CREATE TABLE IF NOT EXISTS user_data(national_id INT PRIMARY_KEY NOT NULL, patient_name TEXT NOT NULL, frequent_sickness TEXT NOT NULL, body_temperature INT NOT NULL, heart_rate INT NOT NULL) ');
+    db.run('CREATE TABLE IF NOT EXISTS user_data (national_id TEXT PRIMARY KEY , patient_name TEXT , frequent_sickness TEXT , body_temperature INTEGER , heart_rate INTEGER )');
 
 })
 
-app.post('/hbca/addData', (req, res)=> {
+app.post('/hbca/register', (req, res)=> {
     const { national_id, patient_name, frequent_sickness, body_temperature, heart_rate  } = req.body;
+    console.log('Request body', req.body);
 
-    if(national_id != null && national_id !== undefined ){
-            //query to insert data into database
+    if(national_id !== null && national_id !== undefined ){
+            // query to insert data into database
         const statement = db.prepare('INSERT INTO user_data (national_id, patient_name, frequent_sickness, body_temperature, heart_rate) VALUES (?, ?, ?, ?, ?)');
 
         try{
@@ -26,9 +26,10 @@ app.post('/hbca/addData', (req, res)=> {
             statement.finalize();
     
             res.json({  message: "data registered successfully"});
+
         }catch(err){
 
-        res.status(500).json({message: err.message});
+        res.status(500).json({message: err.message}); 
         }
     }else{
         res.status(400).json({message: "national_id is required"})
@@ -36,7 +37,7 @@ app.post('/hbca/addData', (req, res)=> {
 
 });
 
-app.get('/hbca/getData', (req, res) => {
+app.get('/hbca/display', (req, res) => {
     
     //query for retrieving data
     db.all('SELECT * FROM user_data', (err, rows) => {
