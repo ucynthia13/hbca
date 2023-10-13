@@ -26,11 +26,8 @@ app.post('/hbca/register', (req, res)=> {
         try{
             statement.run(national_id, patient_name, frequent_sickness, body_temperature, heart_rate);
             statement.finalize();
-    
             res.json({  message: "data registered successfully"});
-
         }catch(err){
-
         res.status(500).json({message: err.message}); 
         }
     }else{
@@ -47,16 +44,19 @@ app.get('/hbca/display', (req, res) => {
             //response if there is an error
             res.status(500).json({message: err.message})
         }
-        rows.forEach(row => {
-            console.log(`${row.national_id}, ${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
-        })
-        res.json({ data: rows});
+
+        if(rows.length > 1){
+            rows.forEach(row => {
+                console.log(`${row.national_id}, ${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
+            })
+            res.json({ data: rows});
+        }
     });
     
 });
 
-app.get('/hbca/freq_disease', (res, req) => {
-    db.all('SELECT COUNT(*) as patients FROM user_data GROUP BY frequent_data ORDER BY patients DESC LIMIT 1' , (err, rows) => {
+app.get('/hbca/freq_disease', (req, res) => {
+    db.all('SELECT *, COUNT(*) as patients FROM user_data GROUP BY frequent_sickness ORDER BY patients DESC LIMIT 1' , (err, rows) => {
         if(err){
             res.status(500).json({ message: err.message})
         }
