@@ -1,9 +1,11 @@
 const sqlite3 = require('sqlite3').verbose();
-const express = require('express')
+const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 5000;
 
 app.use(express.json());
+app.use(cors())
 
 //database connection
 const db = new sqlite3.Database('biometrics');
@@ -17,7 +19,7 @@ app.post('/hbca/register', (req, res)=> {
     const { national_id, patient_name, frequent_sickness, body_temperature, heart_rate  } = req.body;
     console.log('Request body', req.body);
 
-    if(national_id !== null && national_id !== undefined ){
+    if(national_id){
             // query to insert data into database
         const statement = db.prepare('INSERT INTO user_data (national_id, patient_name, frequent_sickness, body_temperature, heart_rate) VALUES (?, ?, ?, ?, ?)');
 
@@ -32,7 +34,7 @@ app.post('/hbca/register', (req, res)=> {
         res.status(500).json({message: err.message}); 
         }
     }else{
-        res.status(400).json({message: "national_id is required"})
+        res.status(400).json({message: "national_id is required in the request"})
     }
 
 });
@@ -52,6 +54,18 @@ app.get('/hbca/display', (req, res) => {
     });
     
 });
+
+app.get('/hbca/freq_disease', (res, req) => {
+    db.all('SELECT COUNT(*) as patients FROM user_data GROUP BY frequent_data ORDER BY patients DESC LIMIT 1' , (err, rows) => {
+        if(err){
+            res.status(500).json({ message: err.message})
+        }
+        rows.forEach(row => {
+            console.log(`${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
+        })
+        res.json({ data: rows})
+    })
+})
 
 
 app.listen(port, ()=> {

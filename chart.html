@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frequent Sickness Chart</title>
+  <!-- Include Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <canvas id="sicknessChart" width="400" height="200"></canvas>
+  <script>
+    // Fetch data from Node.js server
+    fetch('http://localhost:5000/hbca/display')
+      .then(response => response.json())
+
+      .then(data => {
+
+        const patientName = data.data.map(item => item.patient_name);
+        const frequentSickness = data.data.map(item => item.frequent_sickness);
+        const heartRate = data.data.map(item => item.heart_rate);
+        const bodyTemperature = data.data.map(item => item.body_temperature);
+
+        const ctx = document.getElementById('sicknessChart').getContext('2d');
+
+        //  bar chart
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: frequentSickness, 
+
+            datasets: [
+              {
+                label: 'Heart Rate',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+                data: heartRate,
+              },
+
+              {
+                label: 'Body Temperature',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                data: bodyTemperature,
+              },
+
+            ],
+          },
+          options: {
+            scales: {
+              x: {
+                stacked: true,
+              },
+              y: {
+                stacked: true,
+              },
+            },
+          },
+        });
+      });
+  </script>
+  <div class="container">
+    <h4>Frequent Diseases</h4>
+    <script>
+        
+    </script>
+  </div>
+</body>
+</html>
+
