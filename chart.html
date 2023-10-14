@@ -10,8 +10,6 @@
 <body>
   <div class="container">
     <canvas id="sicknessChart" width="400" height="200"></canvas>
-    <canvas id="frequentSickness" width="100" height="50"></canvas>
-  </div>
   
   <script>
     // Fetch data from Node.js server
@@ -51,7 +49,6 @@
                 borderWidth: 1,
                 data: bodyTemperature,
               },
-
             ],
           },
           options: {
@@ -67,21 +64,26 @@
         });
       });
   </script>
+  </div>
   <div class="container">
-    <h4>Frequent Diseases</h4>
+    <h4 id="title" style="display: flex; justify-content: center;">Frequent Sickness - </h4>
+    <canvas id="frequentSickness" width="400" height="200"></canvas>
     <script>
         fetch('http://localhost:5000/hbca/freq_disease')
         .then(response => response.json())
         .then(resp => {
           const patientName = resp.data.map(item => item.patient_name);
-          const heartRate = resp.data.map(item => item.heartRate);
+          const heartRate = resp.data.map(item => item.heart_rate);
           const frequentSickness = resp.data.map(item => item.frequent_sickness);
           const bodyTemperature = resp.data.map(item => item.body_temperature);
-          
-          const ctx = document.getElementById('frequentSickness').getContext('2d');
 
-          new Chart(ctx, {
+          // const header = document.getElementById('title');
+          // header.textContent = frequentSickness;
           
+          const ctx2 = document.getElementById('frequentSickness').getContext('2d');
+          
+          new Chart(ctx2, {
+          type: 'line',
           data: {
             labels: patientName,
             datasets: [
@@ -100,6 +102,11 @@
                 borderWidth: 1,
                 data: bodyTemperature,
               },
+              {
+                // label: `${frequentSickness}`,
+                // data: frequentSickness
+              }
+
             ],
           },
             options: {
@@ -115,7 +122,7 @@
             },
           });
         });
-    
+        
     </script>
   </div>
 </body>
