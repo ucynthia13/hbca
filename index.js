@@ -45,25 +45,39 @@ app.get('/hbca/display', (req, res) => {
             res.status(500).json({message: err.message})
         }
 
-        if(rows.length > 1){
             rows.forEach(row => {
-                console.log(`${row.national_id}, ${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
+                // console.log(`${row.national_id}, ${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
             })
             res.json({ data: rows});
-        }
     });
     
 });
 
 app.get('/hbca/freq_disease', (req, res) => {
-    db.all('SELECT *, COUNT(*) as patients FROM user_data GROUP BY frequent_sickness ORDER BY patients DESC LIMIT 1' , (err, rows) => {
+    db.all('SELECT frequent_sickness FROM user_data GROUP BY frequent_sickness HAVING COUNT(*) > 1 ' , (err, rows) => {
         if(err){
-            res.status(500).json({ message: err.message})
+            res.status(500).json({ message: err.message});
+            return;
         }
-        rows.forEach(row => {
-            console.log(`${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
+
+        if(rows.length === 0){
+            res.json({ message: "No frequent illness"})
+        }
+        
+        //get disease
+        const frequent_diseases = rows.map( row => row.frequent_sickness);
+        
+        db.all(`SELECT * FROM user_data WHERE frequent_sickness IN (${frequent_diseases.map(item => '?').join(',')}) `, frequent_diseases, (err, data ) => {
+            if(err){
+                res.status(500).json({ message: err.message})
+            }
+
+            data.forEach(row => {
+                console.log(`${row.patient_name}, ${row.frequent_sickness}, ${row.body_temperature}, ${row.heart_rate}`);
+
+            })
+            res.json({ data: rows})
         })
-        res.json({ data: rows})
     })
 })
 

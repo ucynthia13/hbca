@@ -8,18 +8,24 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <canvas id="sicknessChart" width="400" height="200"></canvas>
+  <div class="container">
+    <canvas id="sicknessChart" width="400" height="200"></canvas>
+    <canvas id="frequentSickness" width="100" height="50"></canvas>
+  </div>
+  
   <script>
     // Fetch data from Node.js server
     fetch('http://localhost:5000/hbca/display')
       .then(response => response.json())
 
-      .then(data => {
+      //response from the backend
+      //data - actual data
+      .then(response => {
 
-        const patientName = data.data.map(item => item.patient_name);
-        const frequentSickness = data.data.map(item => item.frequent_sickness);
-        const heartRate = data.data.map(item => item.heart_rate);
-        const bodyTemperature = data.data.map(item => item.body_temperature);
+        const patientName = response.data.map(item => item.patient_name);
+        const frequentSickness = response.data.map(item => item.frequent_sickness);
+        const heartRate = response.data.map(item => item.heart_rate);
+        const bodyTemperature = response.data.map(item => item.body_temperature);
 
         const ctx = document.getElementById('sicknessChart').getContext('2d');
 
@@ -64,7 +70,52 @@
   <div class="container">
     <h4>Frequent Diseases</h4>
     <script>
-        
+        fetch('http://localhost:5000/hbca/freq_disease')
+        .then(response => response.json())
+        .then(resp => {
+          const patientName = resp.data.map(item => item.patient_name);
+          const heartRate = resp.data.map(item => item.heartRate);
+          const frequentSickness = resp.data.map(item => item.frequent_sickness);
+          const bodyTemperature = resp.data.map(item => item.body_temperature);
+          
+          const ctx = document.getElementById('frequentSickness').getContext('2d');
+
+          new Chart(ctx, {
+          
+          data: {
+            labels: patientName,
+            datasets: [
+              {
+                label: 'Heart Rate',
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1,
+                data: heartRate,
+              },
+
+              {
+                label: 'Body Temperature',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                data: bodyTemperature,
+              },
+            ],
+          },
+            options: {
+              scales: {
+                x: {
+                  stacked: true,
+                },
+                y: {
+                  stacked: true
+                },
+              },
+
+            },
+          });
+        });
+    
     </script>
   </div>
 </body>
