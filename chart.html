@@ -28,11 +28,11 @@
         const ctx = document.getElementById('sicknessChart').getContext('2d');
 
         //  bar chart
+        
         new Chart(ctx, {
           type: 'line',
           data: {
             labels: frequentSickness, 
-
             datasets: [
               {
                 label: 'Heart Rate',
@@ -76,9 +76,6 @@
           const heartRate = resp.data.map(item => item.heart_rate);
           const frequentSickness = resp.data.map(item => item.frequent_sickness);
           const bodyTemperature = resp.data.map(item => item.body_temperature);
-
-          // const header = document.getElementById('title');
-          // header.textContent = frequentSickness;
           
           const ctx2 = document.getElementById('frequentSickness').getContext('2d');
           
@@ -92,7 +89,7 @@
                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
                 borderColor: 'rgba(255, 99, 132, 1)',
                 borderWidth: 1,
-                data: heartRate,
+                 data: heartRate,
               },
 
               {
@@ -103,8 +100,8 @@
                 data: bodyTemperature,
               },
               {
-                // label: `${frequentSickness}`,
-                // data: frequentSickness
+                label: `${frequentSickness}`,
+                 data: frequentSickness 
               }
 
             ],
