@@ -46,7 +46,7 @@ app.post('/hbca/login', (req, res) => {
 
     db.all('SELECT patient_name, frequent_sickness, body_temperature, heart_rate FROM user_data WHERE patient_email = ? and patient_psw = ?', [email, psw], (err, data)=> {
         if(err){
-            console.error(err.message);
+            console.error(err.message); 
         }
         if(data){
             res.status(200).json({ message: "login successful"})
